@@ -1,1 +1,0 @@
-alert("Hali-hallo javascript through github!");
