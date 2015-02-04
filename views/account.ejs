@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<% include head %>
+<script>
+function vax(meth,url,data,onLoad,onError){
+var xhr=new XMLHttpRequest();
+xhr.open(meth,url);
+xhr.setRequestHeader("Content-Type","application/json");
+xhr.onload=onLoad;
+xhr.onerror=onError;
+xhr.send(data);
+} 
+
+function onLoad(e){
+if(this.status==200){
+console.log(this.responseText);alert('ok');
+}
+}
+function onError(e){alert('fuck');}
+</script>
+</head>
+<body class="wrapper">
+<header> <% include header %></header>
+<main class="main-wr">
+
+<p><a href='/'>home</a> | <a href='/logout'>logout</a></p>
+
+Username: <%= user.username %>
+</br>
+User_id: <%= user._id %>
+</br>
+User.email: <%= user.email %>
+</br>
+User.password: <%= user.password %>
+</br>
+<%= message %>
+<style>
+.loading{background-color:blue;}
+</style>
+<span id=glob class="loading"></span></br>
+<textarea id="tex" name="non-name" placeholder="type this" ></textarea>
+<button id="btn-add" onclick="addData(event);">Send data</button></form>
+<br>
+<div id="status"><b>Here can be figcaption</b></div>
+<table id="table">
+<caption>Caption about Tasks</caption>
+<thead>
+<tr>
+<th>tasks</th><th>status</th><th>edit</th><th>delete</th>
+</tr>
+</thead>
+<tbody id="task-body">
+
+</tbody>
+</table>
+</div>
+<button id=bu onclick="callDB(this)">callDB</button>
+</br>
+<textarea id="edittex" name="non-name" placeholder="edit this" ></textarea>
+<button id="btn-add" onclick="addEdit(this);">save editable</button>
+
+<span id='out4'>test</span>
+<span id='txarout'></span>
+<span id='out'></span>
+<button onclick="doDel(this);">XHR-2-test</button></br>
+<button onclick="fuckdoDel(this);">XHR-POST for IE-9</button></br>
+</br>
+<b>Status for IE-9 xhr: </b>
+</br>
+<span id="iestatus"></span>
+<h3>Like a "file manager" :)</h3>
+</br>
+<button onclick="saveFile(this);">save this file</button>
+<button onclick="showFiles(this);">show files in views</button>
+</br>
+<ul id=outfiles></ul>
+<textarea id="filedit" style="width:400px;height:400px;" placeholder="file for edit"></textarea>
+for ie:
+http://127.0.0.1:5000/account
+
+<script>
+var txarout=document.getElementById('txarout');
+var taskBody=document.getElementById('task-body')
+var adel=document.getElementById('tex');
+var editTx=document.getElementById('edittex');
+
+txarout.textContent=editTx.value='';
+showIndicator('');
+
+function callDB(event){
+showIndicator('Loading...');
+vax('get','/paramorig',null,onLoad,onError);
+
+function onLoad(e){
+ showIndicator('');
+var data=JSON.parse(this.responseText);
+    taskBody.innerHTML='';
+for( var key in data.task){
+var datid=data._id[key];
+ var str='<input data-numb="'+datid+'" class="btn-edit" type="button" value="edit" onclick="editdibk(this)"/>';
+var str2='<input data-numb="'+datid+'" class="btn-del" type="button" value="delete" onclick="deleteTask(this)"/>';
+//editTx.textContent=data.task[8];
+if(!taskBody.childNodes[key]){
+    taskBody.innerHTML+='<tr><th>'
++data.task[key]+'</th><th>'+data.completed[key]+'</th><th>'+str+'</th><th>'+str2+'</th></tr>';
+} 
+}
+}
+}
+
+
+
+
+function editdibk(el){
+//var eved=e.target;
+//var showeved=eved.getAttribute('data-numb');
+  var showeved=el.getAttribute('data-numb');
+ editTx.setAttribute('data-edit',showeved);
+ alert('showeved : '+showeved); 
+ 
+//editTx.value=e.target.parentNode.parentNode.firstChild.innerHTML;
+  editTx.value=el.parentNode.parentNode.firstChild.innerHTML;
+}
+
+function addEdit(e){
+var errCount=0;
+if(editTx.value === ''){errCount++}
+if(errCount === 0){
+var data={};
+txarout.textContent=editTx.value;
+data.name=txarout.textContent;
+data._id=editTx.getAttribute('data-edit');
+var data=JSON.stringify(data);
+vax('post','/savedit',data,onLoad,onError);
+function onLoad(e){
+document.getElementById('out').innerHTML=this.response;
+}
+setTimeout(callDB,1000);
+} else{ alert('Please fill in the field');}
+}
+
+
+function addData(event){
+event.preventDefault();
+var errCount=0;
+if(adel.value ===''){errCount++;}
+ if(errCount === 0){
+ var data={};
+ txarout.textContent=adel.value;
+ data.name=txarout.textContent;
+ var data=JSON.stringify(data);
+ vax('post','/angaben',data,onLoad,onError);
+ function onLoad(e){
+ out.innerHTML=this.response;}
+ setTimeout(callDB,1000);
+} else{ alert("Please fill in the field");return false;}
+}
+
+function deleteTask(el){
+var show=el.getAttribute('data-numb');
+var confirmation = confirm('Are you sure you want to delete this task?');
+if (confirmation === true) {
+alert("OK, man, I'm about deleting this id of task:"+show);
+vax('DELETE','/delete/'+show,null,onLoad,onError);
+function onLoad(e){out.innerHTML=this.response;}
+var drow=el.parentNode.parentNode.rowIndex;
+    //delrow(drow);
+function delrow(drow){
+document.getElementById('table').deleteRow(drow);
+}
+delrow(drow);
+}
+else{ return false;}
+}
+
+//end of data table
+//*********************************************************************
+
+function doDel(event){
+var xhr=new XMLHttpRequest();
+
+xhr.open('POST', '/delta', true);
+xhr.setRequestHeader('Content-type','application/json');
+xhr.onload=function(e){
+if(this.status ==200){
+
+document.getElementById('out').innerHTML=this.responseText;
+}
+}
+xhr.onerror=function(e){alert('fuck');console.log('fuck');};
+var data={};
+data.name="alik";
+
+xhr.send(JSON.stringify(data));
+}
+
+function fuckdoDel(){
+//if ($.browser.msie && window.XDomainRequest) 
+    // Use Microsoft XDR
+    var xdr = new XMLHttpRequest();//new XDomainRequest();
+    xdr.open("post", "/delta");
+xdr.setRequestHeader('Content-type','application/json');
+    xdr.onload = function () {
+ alert('xdr.responseText '+xdr.responseText);
+var iestat=document.getElementById('iestatus');
+    iestat.innerHTML=xdr.responseText;
+/***
+    var JSON = $.parseJSON(xdr.responseText);
+    if (JSON == null || typeof (JSON) == 'undefined')
+    {
+        JSON = $.parseJSON(data.firstChild.textContent);
+    }
+    processData(JSON);
+***/
+    };
+
+ xdr.onprogress = function(){ };
+    xdr.ontimeout = function(){ };
+    xdr.onerror = function () {alert('fuck! Fuckin IE-9!'); };
+   var data={};
+    data.name="alik";
+
+    xdr.send(JSON.stringify(data));
+}
+
+
+/***
+****************
+**************
+function fuckdoDel(){
+//if ($.browser.msie && window.XDomainRequest) 
+    // Use Microsoft XDR
+    var xdr = new XDomainRequest();
+    xdr.open("get", "someurl");
+    xdr.onload = function () {
+ alert('xdr.responseText '+xdr.responseText);
+
+    var JSON = $.parseJSON(xdr.responseText);
+    if (JSON == null || typeof (JSON) == 'undefined')
+    {
+        JSON = $.parseJSON(data.firstChild.textContent);
+    }
+    processData(JSON);
+
+    };
+
+ xdr.onprogress = function(){alert('progress'); };
+    xdr.ontimeout = function(){ };
+    xdr.onerror = function () {alert('fuck! Fuckin IE-9!'); };
+   var data={};
+    data.name="alik";
+
+    xdr.send(JSON.stringify(data));
+}
+
+***/
+//*******************************
+//********************************
+//"file manager"
+
+var filedit=document.getElementById('filedit');
+
+function callFile(event){
+
+alert(event.getAttribute('data-filename'));
+showIndicator('Loading...');
+var bube=event.getAttribute('data-filename');
+filedit.setAttribute('data-fuk',bube);
+//alert(filedit.getAttribute('data-fuk'));
+
+vax('get','/alfa/'+bube,null,onLoad,onError);
+
+function onLoad(e){
+showIndicator('');
+filedit.value=this.responseText;}
+}
+
+function saveFile(event){
+var errCount=0;
+if(filedit.value === ''){errCount++}
+if(errCount === 0){
+
+var bodyfile=filedit.value;
+var data={};
+  data.savingfile=bodyfile;
+  data.qwest=filedit.getAttribute('data-fuk');
+  var data=JSON.stringify(data);
+
+  vax('post','/savefile',data,onLoad,onError);
+}
+else{alert('Please fill in field');}
+}
+
+function onLoad(e){out.innerHTML=this.responseText;}
+
+function showFiles(event){
+showIndicator('Loading..');
+vax('get','/fileslist',null,onLoad,onError);
+function onLoad(e){
+showIndicator('');
+var data=JSON.parse(this.responseText);
+document.getElementById('out').innerHTML=data;
+for(var i=0;i<data.length;i++){
+//alert(data[i]);
+var li=document.createElement('li');
+    li.innerHTML='<button data-filename="'+data[i]+'"     onclick="callFile(this);">'+data[i]+'</button>';
+if(!outfiles.childNodes[i]){
+    outfiles.appendChild(li);}
+}
+}
+}
+
+function filedie(el){
+alert(el.getAttribute('data-filename'));
+doGetDel(this);
+}
+
+
+function showIndicator(text){
+var el=document.getElementById('glob');  
+    el.innerHTML=text;}
+</script>
+<style>
+.main {
+    background: #aaa url() no-repeat;
+    width: 800px;
+    height: 600px;
+    margin: 50px auto;
+}
+.panel {
+    background-color: #444;
+    height: 34px;
+    padding: 10px;
+}
+.panel a#login_pop, .panel a#join_pop {
+    border: 2px solid #aaa;
+    color: #fff;
+    display: block;
+    float: right;
+    margin-right: 10px;
+    padding: 5px 10px;
+    text-decoration: none;
+    text-shadow: 1px 1px #000;
+
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+}
+a#login_pop:hover, a#join_pop:hover {
+    border-color: #eee;
+}
+.overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    bottom: 0;
+    cursor: default;
+    left: 0;
+    opacity: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    visibility: hidden;
+    z-index: 1;
+
+    -webkit-transition: opacity .5s;
+    -moz-transition: opacity .5s;
+    -ms-transition: opacity .5s;
+    -o-transition: opacity .5s;
+    transition: opacity .5s;
+}
+.overlay:target {
+    visibility: visible;
+    opacity: 1;
+}
+.popup {
+    background-color: #fff;
+    border: 3px solid #fff;
+    display: inline-block;
+    left: 50%;
+    opacity: 0;
+    padding: 15px;
+
+    position: fixed;
+    text-align: justify;
+    top: 40%;
+height:300px;
+    overflow-y:scroll;
+   min-height:50px;
+    visibility: hidden;
+
+    z-index: 10;
+
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+
+    -webkit-box-shadow: 0 1px 1px 2px rgba(0, 0, 0, 0.4) inset;
+    -moz-box-shadow: 0 1px 1px 2px rgba(0, 0, 0, 0.4) inset;
+    -ms-box-shadow: 0 1px 1px 2px rgba(0, 0, 0, 0.4) inset;
+    -o-box-shadow: 0 1px 1px 2px rgba(0, 0, 0, 0.4) inset;
+    box-shadow: 0 1px 1px 2px rgba(0, 0, 0, 0.4) inset;
+
+    -webkit-transition: opacity .5s, top .5s;
+    -moz-transition: opacity .5s, top .5s;
+    -ms-transition: opacity .5s, top .5s;
+    -o-transition: opacity .5s, top .5s;
+    transition: opacity .5s, top .5s;
+}
+.popup:hover{background-color:lightgray;}
+.popup::-webkit-scrollbar{width:5px;}
+.popup::-webkit-scrollbar:hover{width:5px;background-color:blue;}
+.popup::-webkit-scrollbar-track{
+box-shadow: inset 0 0 6px rgba(255,0,255,0.3);
+border-radius:2px;
+}
+.popup::-webkit-scrollbar-thumb{
+border-radius:2px;
+
+background:rgba(0,255,0,0.8);
+box-shadow:inset 0 0 6px rgba(0,0,0,0.5);
+}
+.popup::-webkit-srcrollbar-thumb:hover{
+visisbility:visible;
+background-color:rgba(24,255,20,0.6);}
+.popup::-webkit-scrollbar-thumb:active{
+background:rgba(255,0,0,0.4);
+}
+
+
+.overlay:target+.popup {
+    top: 50%;
+    opacity: 1;
+    visibility: visible;
+}
+.close {
+    background-color: rgba(0, 0, 0, 0.8);
+    height: 30px;
+    line-height: 30px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    text-decoration: none;
+    top: -15px;
+    width: 30px;
+
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    -ms-border-radius: 15px;
+    -o-border-radius: 15px;
+    border-radius: 15px;
+}
+.close:before {
+    color: rgba(255, 255, 255, 0.9);
+    content: "X";
+    font-size: 24px;
+    text-shadow: 0 -1px rgba(0, 0, 0, 0.9);
+}
+.close:hover {
+    background-color: rgba(64, 128, 128, 0.8);
+}
+.popup p, .popup div {
+    margin-bottom: 10px;
+}
+.popup label {
+    display: inline-block;
+    text-align: left;
+    width: 120px;
+}
+.popup input[type="text"], .popup input[type="password"] {
+    border: 1px solid;
+    border-color: #999 #ccc #ccc;
+    margin: 0;
+    padding: 2px;
+
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    -ms-border-radius: 2px;
+    -o-border-radius: 2px;
+    border-radius: 2px;
+}
+.popup input[type="text"]:hover, .popup input[type="password"]:hover {
+    border-color: #555 #888 #888;
+}
+</style>
+<div class="main">
+<div class="panel">
+                
+<a href="#login_form" id="login_pop">Log In</a>
+                
+<a href="#join_form" id="join_pop">Sign Up</a>
+           
+ </div>
+
+<a href="#x" class="overlay" id="login_form"></a>
+        
+<div class="popup">
+            
+<h2>Welcome Guest!</h2>
+            
+<p>Please enter your login and password here</p>
+            
+<div>
+                
+<label for="login">Login</label>
+                
+<input type="text" id="login" value="">
+            
+</div>
+            
+<div>
+                
+<label for="password">Password</label>
+                
+<input type="password" id="password" value="">
+            
+</div>
+            
+<input type="button" value="Log In">
+
+            
+<a class="close" href="#"></a>
+        
+</div>
+
+        
+<!-- popup form #2 -->
+        
+<a href="#x" class="overlay" id="join_form"></a>
+        
+<div class="popup">
+ <span id=indigo class="loading">loading</span>
+  <span id="po">popa</span>
+<table id="tabl">
+<caption>Caption about Tasks</caption>
+<thead>
+<tr>
+<th>tasks</th><th>status</th><th>edit</th><th>delete</th>
+</tr>
+</thead>
+<tbody id="popa">
+
+</tbody>
+</table>          
+<h2>Sign Up</h2>
+            
+<p>Please enter your details here</p>
+            
+<div>
+                
+<label for="email">Login (Email)</label>
+                
+<input type="text" id="email" value="">
+            
+</div>
+            
+<div>
+                
+<label for="pass">Password</label>
+                
+<input type="password" id="pass" value="">
+            
+</div>
+            
+<div>
+                
+<label for="firstname">First name</label>
+                
+<input type="text" id="firstname" value="">
+            
+</div>
+    
+<div>
+                
+<label for="lastname">Last name</label>
+        
+<input type="text" id="lastname" value="">
+            
+</div>
+        
+<input type="button" value="Sign Up">&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;
+<a href="#login_form" id="login_pop">Log In</a>
+
+            
+<a class="close" href="#"></a>
+        
+</div>
+  <script>
+var popa=document.getElementById('popa');
+var po=document.getElementById('po');
+var join_pop=document.getElementById('join_pop');
+join_pop.onclick=callB;
+ showIndigo('');
+function callB(event){
+showIndigo('Loading...');
+vax('get','/paramorig',null,onLoad,onError);
+
+function onLoad(e){
+e.stopPropagation();
+ showIndigo('');
+ po.innerHTML='';
+var data=JSON.parse(this.responseText);
+    popa.innerHTML='';
+var li=document.createElement('li');
+for( var key in data.task){
+var datid=data._id[key];
+/***
+    li.innerHTML=data.task[key]+' | '+datid;
+if(popa.childNodes[key]){
+}
+***/
+ var str='<input data-numb="'+datid+'" class="btn-edit" type="button" value="save" onclick="addEdik(this)"/>';
+var str2='<input data-numb="'+datid+'" class="btn-del" type="button" value="delete" onclick="deleteTas(this)"/>';
+//editTx.textContent=data.task[8];
+if(!popa.childNodes[key]){
+    popa.innerHTML+='<tr><th contenteditable=true>'
++data.task[key]+'</th><th>'+data.completed[key]+'<input type="checkbox" data-numb="'+datid+'" onchange="sendDone(this)" value="'+data.completed[key]+'"/></th><th>'+str+'</th><th>'+str2+'</th></tr>';
+}
+
+}
+
+}
+}
+//po.innerHTML='1';
+function addEdik(el){
+//var errCount=0;
+//if(editTx.value === ''){errCount++}
+//if(errCount === 0){
+ showIndigo('Saving...');
+var data={};
+var su=el.parentNode.parentNode.firstChild.innerHTML;
+var num_id=el.getAttribute('data-numb');
+alert('el.Content :'+su+' _id :'+num_id);
+//el.textContent=editTx.value;
+ data.name=su;
+ data._id=num_id;
+ var data=JSON.stringify(data);
+//po.innerHTML='';
+ vax('post','/savedit',data,onLoad,onError);
+function onLoad(e){
+ showIndigo('');
+  po.innerHTML+='ok'+this.response;
+}
+//setTimeout(callDB,1000);
+//} 
+//else{ alert('Please fill in the field');}
+}
+
+function deleteTas(el){
+
+var show=el.getAttribute('data-numb');
+var confirmation = confirm('Are you sure you want to delete this task?');
+if (confirmation === true) {
+showIndigo('Deleting...');
+alert("OK, man, I'm about deleting this id of task:"+show);
+vax('DELETE','/delete/'+show,null,onLoad,onError);
+function onLoad(e){
+showIndigo('');
+po.innerHTML=this.response;}
+var drow=el.parentNode.parentNode.rowIndex;
+    //delrow(drow);
+function delrow(drow){
+document.getElementById('tabl').deleteRow(drow);
+}
+delrow(drow);
+}
+else{ return false;}
+}
+function sendDone(el){
+alert('aha '+el.value+' | '+el.getAttribute('data-numb'));
+showIndigo('Saving...');
+var data={};
+    data._id=el.getAttribute('data-numb');
+ var data=JSON.stringify(data);   
+vax('post','/savedone',data,onLoad,onError);
+function onLoad(e){
+showIndigo('');
+po.innerHTML=this.response;}
+setTimeout(callB,1000);
+}
+function showIndigo(text){
+var indigo=document.getElementById('indigo');  
+    indigo.innerHTML=text;}
+</script>  
+</main>
+
+<footer><% include footer %></footer>
+</body>
+</html>
