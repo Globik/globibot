@@ -2,4 +2,4 @@ globibot
 ========
 
 My first nodejs "app".
-First editing... Hm
+nodejs N-API experiments.
