@@ -116,7 +116,7 @@ napi_property_descriptor properties[]={
 	{"Test",0,Test,0,0,0,napi_default,0}
 };
 status=napi_define_properties(env,exports,sizeof(properties)/sizeof(*properties),properties);
-	assert(status==napi_ok);
+assert(status==napi_ok);
 return exports;
 }
 NAPI_MODULE(addon,Init)

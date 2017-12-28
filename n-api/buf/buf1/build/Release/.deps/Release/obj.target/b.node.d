@@ -1,0 +1,1 @@
+cmd_Release/obj.target/b.node := g++ -shared -pthread -rdynamic -m32  -Wl,-soname=b.node -o Release/obj.target/b.node -Wl,--start-group Release/obj.target/b/buf.o -Wl,--end-group /home/globik/uap-c/libuaparser.a -lyaml -lpcre

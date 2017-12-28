@@ -10,9 +10,13 @@ console.log('Object: ',ob);
 bob(ua_agent).then(resu=>{console.log('resu: ',resu)})
 console.log('after obj');
 
-
+bob(ua_agent).then(resu=>{console.log('resu: ',resu)})
+console.log('after obj');
 function bob(n){
 return new Promise((res,rej)=>{
 res(addon(n));
 })
 }
+var ab=Buffer.from(ua_agent);
+console.log('length: ', ab.length,'len: ',ua_agent.length);
+console.log('ab: ',ab)

@@ -15,9 +15,9 @@ napi_value CreateObject(napi_env env,const napi_callback_info info){
 
 	napi_status status;
 	size_t argc=1;
-	char sbuf[128];
-	size_t bs=128,bres;
-	napi_value args[1],ua_family,ua_major,ua_minor,ua_patch,os_family,os_major,os_minor, os_patch;
+	char sbuf[255];
+	size_t bs=256,bres;
+	napi_value args[1], ua_family,ua_major,ua_minor,ua_patch,os_family,os_major,os_minor, os_patch;
 	napi_value device_family, device_brand, device_model;
 	napi_value obj;
 	napi_valuetype valuetype;
@@ -35,12 +35,16 @@ napi_value CreateObject(napi_env env,const napi_callback_info info){
 	//napi_get_value_string_utf8(env,napi_value value,char*buf,size_t bufsize,size_t*result)
 	status=napi_get_value_string_utf8(env,args[0],sbuf,bs,&bres);
 	assert(status==napi_ok);
-	printf("HERE must be a string from outside: %s\n",sbuf);
-	struct user_agent_parser *ua_parser = user_agent_parser_create();
+	//printf("HERE must be a string from outside: %s\n",sbuf);
+	//printf("BS: %zu\n",bs);
+	//printf("BRES: %zu\n",bres);
+	//printf("len: %zu\n",sizeof(sbuf));
+
+struct user_agent_parser *ua_parser = user_agent_parser_create();
 struct user_agent_info *ua_info = user_agent_info_create();
 user_agent_parser_read_buffer(ua_parser, ___uap_core_regexes_yaml, ___uap_core_regexes_yaml_len);
 	
-if (user_agent_parser_parse_string(ua_parser, ua_info,/* st*/sbuf)) {
+if (user_agent_parser_parse_string(ua_parser, ua_info,sbuf)) {
 	status=napi_create_string_utf8(env,ua_info->user_agent.family,NAPI_AUTO_LENGTH,&ua_family);
 	assert(status==napi_ok);
 	status=napi_create_string_utf8(env, ua_info->user_agent.major,NAPI_AUTO_LENGTH,&ua_major);
@@ -96,6 +100,7 @@ if (user_agent_parser_parse_string(ua_parser, ua_info,/* st*/sbuf)) {
 	}
 	user_agent_parser_destroy(ua_parser);
 	user_agent_info_destroy(ua_info);
+	
 	return obj;
 }
 napi_value Init(napi_env env,napi_value exports){
