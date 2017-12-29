@@ -5,15 +5,21 @@
 #include "user_agent_parser.h"
 #include "regexes.yaml.h"
 // gcc -I.build -I./include -o test test.c -L. -luaparser -lyaml -lpcre
+//struct user_agent_parser *ua_parser=NULL;
+//struct user_agent_info *ua_info = NULL;
+//ua_parser = user_agent_parser_create();
 int main(int argc, char **argv) {
 //if (argc < 2) {printf("usage: %s <user agent string>\n", argv[0]);return -1;}
 const char* st="Mozilla/5.0 (Linux; U; Android 4.3; MediaPad 7 Youth 2 Build/HuaweiMediaPad) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30 OPR/23.0.2254.114329";
 
 struct user_agent_parser *ua_parser = user_agent_parser_create();
-struct user_agent_info *ua_info = user_agent_info_create();
-
-	user_agent_parser_read_buffer(ua_parser, ___uap_core_regexes_yaml, ___uap_core_regexes_yaml_len);
-
+struct user_agent_info *
+	ua_info = user_agent_info_create();
+int a;
+	a=user_agent_parser_read_buffer(ua_parser, ___uap_core_regexes_yaml, ___uap_core_regexes_yaml_len);
+printf("int: %d\n",a);
+	int i;
+	for(i=0;i<50;i++){
 	if (user_agent_parser_parse_string(ua_parser, ua_info, st)) {
 
 		printf("user_agent.family\t%s\n",  ua_info->user_agent.family);
@@ -33,6 +39,7 @@ struct user_agent_info *ua_info = user_agent_info_create();
 
 	}else{
 	printf("oh, fuck\n");
+	}
 	}
 	user_agent_parser_destroy(ua_parser);
 	user_agent_info_destroy(ua_info);

@@ -15,3 +15,13 @@ It's a C implementation of the user-agent string parser described in ua-parser/u
 * libpcre3
 
 Node Add-on Example with uap-c for native module
+
+# P.S.
+
+One can end up this project. Alas, javascript version of uap-core is much faster than addon itself. x4 faster. No benefit from C code.
+
+C is a king and shines when it is in the native environments among C-applications. But it is not the case when javascript addon based on C/C++.
+
+Addons are shining when you need some C library solution. For example libnice, stun etc.
+
+# END!
