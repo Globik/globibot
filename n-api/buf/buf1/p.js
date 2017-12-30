@@ -9,14 +9,8 @@ class Encoder {
         let buffer = Buffer.from ? Buffer.from(value) : new Buffer(value);
         options = Object.assign({}, this.options, options);
        
-        //qrencode_args[qrencode_args.length] = '--foreground=' + options.foreground_color.replace('#', '');
-       // qrencode_args[qrencode_args.length] = '--background=' + options.background_color.replace('#', '');
-        //if (options.case_sensitive) {
-         //   qrencode_args[qrencode_args.length] = '-i';
-       // }
-        //qrencode_args[qrencode_args.length] = buffer;
         return new Promise((resolve, reject) => {
-            let process = child_process_1.spawn(pizd,[buffer] /*qrencode_args*/);
+            let process = child_process_1.spawn(pizd,[buffer]);
             process.stdout.on('data', (data) => {
                 resolve(data);
             });
