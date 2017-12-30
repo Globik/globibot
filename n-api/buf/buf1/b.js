@@ -1,8 +1,9 @@
 // home/globik/globibot/n-api/buf/buf1/b.js
 var ad=require('./build/Release/b');
 var {measure}=require("../../../measure.js");
-var t=`Mozilla/5.0 (Linux; U; Android 4.3; MediaPad 7 Youth 2 Build/HuaweiMediaPad)
-AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30 OPR/23.0.2254.114329`;//\0`;//\u0000`;
+const {Encoder}=require('./p.js');
+const w=5;
+const t=`Mozilla/5.0 (Linux; U; Android 4.3; MediaPad 7 Youth 2 Build/HuaweiMediaPad) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30 OPR/23.0.2254.114329`;//\0`;//\u0000`;
 //function init(){
 //Sascha geht ins Kino.
 var buf=Buffer.from(t+'\0');
@@ -14,7 +15,7 @@ console.log('bInit: ',m);
 var boo=measure(boo);
 
 boo(1);
-boo(5)
+boo(w)
 
 function boo(n){
 	for(var i=0;i<n;i++){
@@ -34,6 +35,19 @@ console.log('bEnd: ',dr);
 //2420.806ms
 // 61 ms if n=1
 //33912.998ms if n=5000
+function dura(n){
+	for(var i=0;i<n;i++){
+(async function(){
+try{
+let b=await Encoder.encode(t,null,null)
+//console.log('result2:',b.toString());
+}catch(e){console.log("Erri: ",e)}
+})()
+	}
+}
+var dura=measure(dura);
+dura(1);
+dura(w);
 console.log('du');
 process.on('beforeExit',()=>{console.log("beforeExit")})
 process.on('exit',(code)=>{console.log('exit: ',code)})
