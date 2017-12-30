@@ -11,32 +11,14 @@ console.log('bInit: ',m);
 //let a=ad.bufferInfo(buf);
 //console.log('obj: ',a)
 
-var bood=measure(bood);
-function bood(n){
-	for(let i=0;i<n;i++){
-		//setInterval(function(){
-	boo1(10,buf).then(d=>{console.log('DATA: ',d);})
-		//},1);
-	}
-}
-//bood(1);bood(1);bood(1);bood(10);
-bood(1);
-bood(1);
-bood(1);
-//setInterval(function(){bood(1)},2000);
-//let m2=ad.bEnd();
-//console.log('bEnd: ',m2);
-//var buf=Buffer(t);
-/*var a=ad(buf);
-console.log('a: ',a);
-console.log('ob?: ',ad);
-*/
-//}
-//try{init()}catch(e){console.log(e);ad.bEnd();}
+var boo=measure(boo);
+
+boo(1);
+boo(5)
 
 function boo(n){
 	for(var i=0;i<n;i++){
-		let mi=ad.bufferInfo(buf);
+		ad.bufferInfo(buf);
 		//console.log('mi: ',mi);
 	}
 }
@@ -51,6 +33,7 @@ console.log('bEnd: ',dr);
 //boo(50);
 //2420.806ms
 // 61 ms if n=1
+//33912.998ms if n=5000
 console.log('du');
 process.on('beforeExit',()=>{console.log("beforeExit")})
 process.on('exit',(code)=>{console.log('exit: ',code)})

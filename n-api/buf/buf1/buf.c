@@ -61,10 +61,10 @@ status=napi_get_cb_info(env, info, &argc, args,NULL,NULL);
 
 	napi_value theBuffer=args[0], ua_family;
 	
-	char* bufferData;
+	const char* bufferData;
 	napi_value obj;
-	size_t bufferLength;
-	status=napi_get_buffer_info(env,theBuffer,(void**)(&bufferData),&bufferLength);
+	//size_t bufferLength;
+	status=napi_get_buffer_info(env,theBuffer,(void**)(&bufferData),/*&bufferLength*/NULL);
 	if(status !=napi_ok){return NULL;}
 	//assert(status==napi_ok);
 	//printf("here: %s\n",bufferData);
@@ -74,19 +74,26 @@ status=napi_get_cb_info(env, info, &argc, args,NULL,NULL);
 	//assert(status==napi_ok);
 //struct user_agent_parser *ua_parser = user_agent_parser_create();
 //struct user_agent_info *ua_info = user_agent_info_create();
-user_agent_parser_read_buffer(ua_parser, ___uap_core_regexes_yaml, ___uap_core_regexes_yaml_len);
-	
-if (user_agent_parser_parse_string(ua_parser, ua_info,bufferData)) {
-	status=napi_create_string_utf8(env,ua_info->user_agent.family,NAPI_AUTO_LENGTH,&ua_family);
-	if(status !=napi_ok){return NULL;}
-	//assert(status==napi_ok);
+//user_agent_parser_read_buffer(ua_parser, ___uap_core_regexes_yaml, ___uap_core_regexes_yaml_len);
 	status=napi_create_object(env,&obj);
 	if(status !=napi_ok){return NULL;}
+
+if (user_agent_parser_parse_string(ua_parser, ua_info,bufferData)) {
+	//status=
+	napi_create_string_utf8(env,ua_info->user_agent.family,NAPI_AUTO_LENGTH,&ua_family);
+	//if(status !=napi_ok){return NULL;}
 	//assert(status==napi_ok);
-	status=napi_set_named_property(env,obj,"ua_family",ua_family);//major,minor,patch
-	if(status !=napi_ok){return NULL;}
+	
+	//assert(status==napi_ok);
+	//status=napi_set_named_property(env,obj,"ua_family",ua_family);//major,minor,patch
+	//if(status !=napi_ok){return NULL;}
 	//assert(status==napi_ok);
 }
+	napi_property_descriptor descriptors[]={
+		{"ua_family",NULL,0,0,0,ua_family,napi_default,0}
+	};
+	status=napi_define_properties(env,obj,sizeof(descriptors)/sizeof(descriptors[0]),descriptors);
+	//assert(status==napi_ok);
 	//user_agent_parser_destroy(ua_parser);
 	//user_agent_info_destroy(ua_info);
 	return obj;
